@@ -5,8 +5,8 @@ SaaS Starter includes email capabilities for sending emails to users, and admins
 There are three types of emails:
 
 - Admin emails: sent to a static admin email address, useful for monitoring app activity like new signups and contact-us form submissions.
-- User emails: sent to the user's email address. For example: a welcome email.
-- Auth emails: verifing the user's email address and magic links. Auth emails are covered in the main README setup docs, and not covered here.
+- User emails: sent to the architect's email address. For example: a welcome email.
+- Auth emails: verifing the architect's email address and magic links. Auth emails are covered in the main README setup docs, and not covered here.
 
 ## Set Up Email
 
@@ -20,7 +20,7 @@ To enable email capabilities, set the following environment variables:
 
 ## Customize Welcome Email
 
-SaaS Starter includes a welcome email template that you can customize to fit your brand and content. The email is sent to the user's email address when create their profile.
+SaaS Starter includes a welcome email template that you can customize to fit your brand and content. The email is sent to the architect's email address when create their profile.
 
 To customize the email:
 
