@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# forge/web — CMSaasStarter (SvelteKit + Supabase CMS, StageCMS fork). bin/run.
+#
+# Primary operation: run the CMS web app (`npm run dev`/`build`/`preview`).
+# This rig surfaces the web app; full build/test need `npm install` on a bare
+# checkout (node_modules not vendored).
+#
+# Usage:
+#   bin/run dev       vite dev
+#   bin/run build     vite build
+#   bin/run checks    ./checks.sh (spell + format + lint + svelte-check + test)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+NODE="${NODE:-$(command -v node 2>/dev/null || true)}"
+for c in "$NODE" /usr/bin/node /usr/local/bin/node; do
+  [ -n "$c" ] && [ -x "$c" ] && { NODE="$c"; break; }
+done
+[ -n "${NODE:-}" ] || { echo "FAIL: node not found"; exit 1; }
+
+case "${1:-boot}" in
+  dev)    echo "== forge/web run: dev (vite dev) =="; exec npm run dev ;;
+  build)  echo "== forge/web run: build (vite build) =="; exec npm run build ;;
+  checks) echo "== forge/web run: full checks (checks.sh) =="; exec ./checks.sh ;;
+  boot|*)
+    echo "== forge/web run: structural boot (CMSaasStarter) =="
+    "$NODE" -e "
+      const d=require('./package.json');
+      const need=['check','test','lint','build','dev'];
+      const miss=need.filter(s=>!d.scripts||!(s in d.scripts));
+      if(miss.length){ console.log('FAIL: missing scripts', miss); process.exit(1);}
+      console.log('OK: app scripts present: '+need.join(', '));
+    " || exit 1
+    [ -x checks.sh ] && echo "OK: checks.sh (full gate) present" || echo "WARN: checks.sh missing"
+    echo "use: bin/run dev | build | checks. deps: npm install first on bare checkout."
+    ;;
+esac

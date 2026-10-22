@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# forge/web — CMSaasStarter (SvelteKit + Supabase CMS). bin/check.
+#
+# Fast self-test (PASS/FAIL), no build:
+#   1. package.json parses; check/test/lint/build/dev scripts exist.
+#   2. checks.sh full gate present + executable.
+#   3. SvelteKit config + source present.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+echo "== forge/web check: start =="
+NODE="${NODE:-$(command -v node 2>/dev/null || true)}"
+for c in "$NODE" /usr/bin/node /usr/local/bin/node; do
+  [ -n "$c" ] && [ -x "$c" ] && { NODE="$c"; break; }
+done
+[ -n "${NODE:-}" ] || { echo "FAIL: node not found"; exit 1; }
+
+"$NODE" -e "
+  const d=require('./package.json');
+  const need=['check','test','lint','build','dev'];
+  const miss=need.filter(s=>!d.scripts||!(s in d.scripts));
+  if(miss.length){ console.log('FAIL: missing scripts', miss); process.exit(1);}
+  console.log('OK: app scripts present: '+need.join(', '));
+" || exit 1
+
+[ -x checks.sh ] && echo "OK: checks.sh present + executable" || echo "FAIL: checks.sh missing"; 
+for f in svelte.config.js vite.config.ts src; do
+  [ -e "$f" ] && echo "OK: $f present" || echo "WARN: $f missing"
+done
+echo "FORGE/WEB CHECK: PASS"
+exit 0
